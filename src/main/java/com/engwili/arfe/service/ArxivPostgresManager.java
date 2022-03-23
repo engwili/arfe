@@ -5,7 +5,6 @@ import com.engwili.arfe.dto.response.WorkStatusDto;
 import com.engwili.arfe.engine.ArticleRetrieval;
 import com.engwili.arfe.engine.LocationRetrieval;
 import com.engwili.arfe.engine.LocationSaving;
-import com.engwili.arfe.entity.Article;
 import com.engwili.arfe.entity.WorkStatus;
 import com.engwili.arfe.mapper.WorkMapper;
 import com.engwili.arfe.repository.ArticleRepository;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -37,42 +35,10 @@ public class ArxivPostgresManager implements Manager {
     public CompletableFuture<Integer> scrapArticlesAndStoreThem() {
         var unvisitedScrappingLocations = locationRetrieval.retrieveUnvisitedScrappingLocations();
 
-//
-//
-//        //todo aici e problema si la work status ca se genereaza de fiecare data si nu o singura data pe trigger
-//        var result = CompletableFuture
-//                .supplyAsync(() -> unvisitedScrappingLocations, executorService)
-//                .thenApplyAsync(articleRetrieval::retrieveArticle, executorService);
-//
-////        var result2 = CompletableFuture
-////                .supplyAsync(() -> result.thenCombine(), executorService)
-////                .thenAcceptAsync(el ->)
-////                .whenComplete((list, throwable) -> {
-////                    articleRepository.saveAll(list);
-////                    return list.size();
-////                });
-//
-////        result
-////                .thenApplyAsync(List::size, executorService)
-////                .toCompletableFuture();
-//
-//        var saved = CompletableFuture
-//                .supplyAsync(() -> unvisitedScrappingLocations)
-////                .whenComplete((el, th) -> locationSaving.saveVisitedLocation(unvisitedScrappingLocations))
-//                .thenAcceptAsync(locationSaving::saveVisitedLocation, executorService)
-//                .toCompletableFuture();
-////
-////        CompletableFuture
-////                .supplyAsync(() -> unvisitedScrappingLocations, executorService)
-////                .thenAcceptAsync(locationSaving::saveVisitedLocation, executorService)
-////                .toCompletableFuture();
-//
-//        return result;
-
         var result = CompletableFuture
                 .supplyAsync(() -> unvisitedScrappingLocations, executorService)
                 .thenApplyAsync(articleRetrieval::retrieveArticle, executorService)
-                .whenComplete((articles,s) -> articleRepository.saveAll(articles))
+                .whenComplete((articles, s) -> articleRepository.saveAll(articles))
                 .thenApplyAsync(List::size, executorService);
 
         var savedVisitedLocation = CompletableFuture
@@ -82,17 +48,6 @@ public class ArxivPostgresManager implements Manager {
 
         CompletableFuture.allOf(result, savedVisitedLocation);
 
-//        var savedArticles = result
-//
-//        CompletableFuture<Integer> integerCompletableFuture = result
-//                .thenCompose(el -> countedRetrievedArticles);
-//
-//        CompletableFuture
-//                .supplyAsync(() -> unvisitedScrappingLocations)
-//                .thenAcceptAsync(locationSaving::saveVisitedLocation, executorService)
-//                .toCompletableFuture();
-
-//        return countedRetrievedArticles;
         return result;
     }
 
