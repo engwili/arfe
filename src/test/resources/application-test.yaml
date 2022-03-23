@@ -1,0 +1,16 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    generate-ddl: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      format-sql: true
+  liquibase:
+    enabled: false

@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  postgres-db:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./database:/var/lib/postgresql

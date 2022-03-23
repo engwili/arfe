@@ -1,0 +1,14 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    hikari:
+      auto-commit: false
+    url: "jdbc:postgresql://localhost:5432/postgres"
+    username: postgres
+    password: postgres
+  liquibase:
+    change-log: classpath:db/changelog.xml
+    enabled: false
