@@ -9,7 +9,7 @@ spring:
   jpa:
     generate-ddl: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       format-sql: true
   liquibase:

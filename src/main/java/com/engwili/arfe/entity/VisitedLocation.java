@@ -26,4 +26,10 @@ public class VisitedLocation {
 
     @OneToOne
     private ScrappingLocation scrappingLocation;
+
+    public VisitedLocation(ScrappingLocation location) {
+        this.accessedAt = LocalDate.now();
+        this.scrappingLocation = location;
+        this.visited = true;
+    }
 }

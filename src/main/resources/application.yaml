@@ -1,7 +1,7 @@
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   datasource:
     hikari:
@@ -11,4 +11,3 @@ spring:
     password: postgres
   liquibase:
     change-log: classpath:db/changelog.xml
-    enabled: false

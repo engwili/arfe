@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 @DataJpaTest
 @ActiveProfiles("test")
-class PostgresLocationSavingTest {
+class PosgressLocationSavingTest {
 
     @Autowired
     private TestEntityManager testEntityManager;
 
     @SpyBean
-    private PostgresLocationSaving postgresLocationSaving;
+    private PosgressLocationSaving posgressLocationSaving;
 
     @Autowired
     private VisitedLocationRepository visitedLocationRepository;
@@ -72,7 +72,7 @@ class PostgresLocationSavingTest {
 
         Assertions.assertThat(visitedLocationRepository.findByVisitedAndAccessedAt(true, LocalDate.now())).hasSize(2);
 
-        postgresLocationSaving.saveVisitedLocation(List.of(scrappingLocation0, scrappingLocation1, scrappingLocation2));
+        posgressLocationSaving.saveVisitedLocation(List.of(scrappingLocation0, scrappingLocation1, scrappingLocation2));
 
         List<VisitedLocation> byVisitedAndDateAfter = visitedLocationRepository.findByVisitedAndAccessedAt(true, LocalDate.now());
 

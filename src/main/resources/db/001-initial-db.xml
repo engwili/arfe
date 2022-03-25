@@ -1,35 +1,32 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-
-    <changeSet author="dbeaver" id="1" runOnChange="true">
-        <createTable tableName="article">
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+    <changeSet author="dbeaver" id="1648211776030-2">
+        <createTable schemaName="public" tableName="article">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="article_pkey"/>
             </column>
-            <column name="accessed_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
-            <column name="authors" type="text"/>
-            <column name="categories" type="text"/>
-            <column name="created_at" type="text"/>
-            <column name="downloadable_content_url" type="text"/>
+            <column name="accessed_at" type="date"/>
+            <column name="authors" type="OID"/>
+            <column name="categories" type="OID"/>
+            <column name="created_at" type="VARCHAR(255)"/>
+            <column name="downloadable_content_url" type="VARCHAR(255)"/>
             <column name="summary" type="OID"/>
-            <column name="title" type="VARCHAR(255)"/>
+            <column name="title" type="OID"/>
         </createTable>
     </changeSet>
-    <changeSet author="dbeaver" id="2" runOnChange="true">
-        <createTable tableName="scrapping_location">
+    <changeSet author="dbeaver" id="1648211776030-3">
+        <createTable schemaName="public" tableName="scrapping_location">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="scrapping_location_pkey"/>
             </column>
-            <column name="frequency" type="text"/>
+            <column name="frequency" type="VARCHAR(255)"/>
             <column name="max_article_scraped" type="INTEGER"/>
-            <column name="nickname" type="text"/>
-            <column name="url" type="text"/>
+            <column name="nickname" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
-    <changeSet author="dbeaver" id="3" runOnChange="true">
-        <createTable tableName="visited_location">
+    <changeSet author="dbeaver" id="1648211776030-4">
+        <createTable schemaName="public" tableName="visited_location">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="visited_location_pkey"/>
             </column>
@@ -40,10 +37,17 @@
             <column name="scrapping_location_id" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="dbeaver" id="4" runOnChange="true">
-        <addForeignKeyConstraint baseColumnNames="scrapping_location_id" baseTableName="visited_location"
-                                 constraintName="fkegk23bt1bp0cdub2q6ihddc87" deferrable="false"
-                                 initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
-                                 referencedColumnNames="id" referencedTableName="scrapping_location" validate="true"/>
+    <changeSet author="dbeaver" id="1648211776030-5">
+        <createTable schemaName="public" tableName="work_status">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="work_status_pkey"/>
+            </column>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="triggered_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="work_id" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="dbeaver" id="1648211776030-6">
+        <addForeignKeyConstraint baseColumnNames="scrapping_location_id" baseTableName="visited_location" baseTableSchemaName="public" constraintName="fkegk23bt1bp0cdub2q6ihddc87" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="scrapping_location" referencedTableSchemaName="public" validate="true"/>
     </changeSet>
 </databaseChangeLog>

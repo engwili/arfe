@@ -2,7 +2,7 @@ package com.engwili.arfe.service;
 
 import com.engwili.arfe.engine.ArticleRetrieval;
 import com.engwili.arfe.engine.LocationRetrieval;
-import com.engwili.arfe.engine.PostgresLocationSaving;
+import com.engwili.arfe.engine.PosgressLocationSaving;
 import com.engwili.arfe.entity.*;
 import com.engwili.arfe.mapper.WorkMapper;
 import com.engwili.arfe.repository.ArticleRepository;
@@ -59,7 +59,27 @@ class ArxivPostgresManagerTest {
     private VisitedLocationRepository visitedLocationRepository;
 
     @Autowired
+    private PosgressLocationSaving posgressLocationSaving;
+
+    @Autowired
     private WorkMapper workMapper;
+//
+//    @ClassRule
+//    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:11.1")
+//            .withDatabaseName("integration-tests-db")
+//            .withUsername("sa")
+//            .withPassword("sa");
+//
+//    static class Initializer
+//            implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+//        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
+//            TestPropertyValues.of(
+//                    "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
+//                    "spring.datasource.username=" + postgreSQLContainer.getUsername(),
+//                    "spring.datasource.password=" + postgreSQLContainer.getPassword()
+//            ).applyTo(configurableApplicationContext.getEnvironment());
+//        }
+//    }
 
     private static final String arxivAI = "https://arxiv.org/list/cs.AI/recent";
     private static final String arxivDS = "https://arxiv.org/list/cs.DS/recent";
@@ -72,7 +92,7 @@ class ArxivPostgresManagerTest {
         ArgumentCaptor<ArrayList<Article>> captor = ArgumentCaptor.forClass(ArrayList.class);
 
         ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, new PostgresLocationSaving(visitedLocationRepository),
+                articleRepository, posgressLocationSaving,
                 Executors.newCachedThreadPool(), workStatusRepository, workMapper);
 
         var scrappingLocation1 = ScrappingLocation.builder()
@@ -134,7 +154,7 @@ class ArxivPostgresManagerTest {
     void retrieveWorkProofFromWorkId() {
 
         ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, new PostgresLocationSaving(visitedLocationRepository),
+                articleRepository, posgressLocationSaving,
                 Executors.newCachedThreadPool(), workStatusRepository, workMapper);
         var workId = "uuid";
         var now = Instant.now();
@@ -153,7 +173,7 @@ class ArxivPostgresManagerTest {
     @Test
     void retrieveWorkProofFromInstantNoUnvisitedLocations() {
         ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, new PostgresLocationSaving(visitedLocationRepository),
+                articleRepository, posgressLocationSaving,
                 Executors.newCachedThreadPool(), workStatusRepository, workMapper);
         var firstWorkId = "uuid";
         var now = Instant.now();
@@ -172,7 +192,7 @@ class ArxivPostgresManagerTest {
     @Test
     void retrieveWorkProofFromInstantOneUnvisitedLocation() {
         ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, new PostgresLocationSaving(visitedLocationRepository),
+                articleRepository, posgressLocationSaving,
                 Executors.newCachedThreadPool(), workStatusRepository, workMapper);
         var firstWorkId = "uuid";
         var now = Instant.now();

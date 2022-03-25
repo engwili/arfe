@@ -35,7 +35,7 @@ public class ArxivPostgresManager implements Manager {
     public CompletableFuture<Integer> scrapArticlesAndStoreThem() {
         var unvisitedScrappingLocations = locationRetrieval.retrieveUnvisitedScrappingLocations();
 
-        var result = CompletableFuture
+        var scrappedArticleCount = CompletableFuture
                 .supplyAsync(() -> unvisitedScrappingLocations, executorService)
                 .thenApplyAsync(articleRetrieval::retrieveArticle, executorService)
                 .whenComplete((articles, s) -> articleRepository.saveAll(articles))
@@ -46,9 +46,9 @@ public class ArxivPostgresManager implements Manager {
                 .thenAcceptAsync(locationSaving::saveVisitedLocation, executorService)
                 .toCompletableFuture();
 
-        CompletableFuture.allOf(result, savedVisitedLocation);
+        CompletableFuture.allOf(scrappedArticleCount, savedVisitedLocation);
 
-        return result;
+        return scrappedArticleCount;
     }
 
     @Override

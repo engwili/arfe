@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class PostgresLocationSaving implements LocationSaving {
+public class PosgressLocationSaving implements LocationSaving {
 
     private final VisitedLocationRepository visitedLocationRepository;
 
@@ -34,10 +34,7 @@ public class PostgresLocationSaving implements LocationSaving {
 
         var visitedLocationsToBeAdded = toBeSaved
                 .stream()
-                .map(el -> {
-                    var aux = new VisitedLocation();
-                    return aux.visited(true).accessedAt(LocalDate.now()).scrappingLocation(el);
-                })
+                .map(VisitedLocation::new)
                 .collect(Collectors.toList());
 
         visitedLocationRepository.saveAll(visitedLocationsToBeAdded);
