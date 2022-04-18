@@ -11,8 +11,9 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class ScrappingClientService {
     private final ScrappingLocationRepository scrappingLocationRepository;
     private final ScrapLocationMapper scrapLocationMapper;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Long addLocation(ScrapLocationDto scrapLocationDto) {
         return scrappingLocationRepository
                 .findByUrl(scrapLocationDto.getUrl())
@@ -32,19 +33,17 @@ public class ScrappingClientService {
                 .orElseGet(() -> scrappingLocationRepository.save(scrapLocationMapper.dtoToModel(scrapLocationDto)).id());
     }
 
-    @Transactional
     public List<ScrappingLocation> getLocation(Long id) {
         return scrappingLocationRepository.findById(id)
                 .stream()
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public List<ScrappingLocation> getLocationByPage(Integer page, Integer size) {
         return scrappingLocationRepository.findAll(PageRequest.of(page, size)).getContent();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public boolean updateLocation(Long id, ScrapLocationDto scrapLocationDto) {
         return scrappingLocationRepository
                 .findById(id)
@@ -53,7 +52,7 @@ public class ScrappingClientService {
                 .isPresent();
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = RuntimeException.class)
     public void deleteLocations(List<Long> locationIds) throws ArfeException {
         try {
             scrappingLocationRepository.deleteAllById(locationIds);

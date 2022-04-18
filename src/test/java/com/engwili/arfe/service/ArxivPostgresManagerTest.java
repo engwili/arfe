@@ -20,7 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -36,8 +35,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @ActiveProfiles("test")
-@Transactional
-@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ArxivPostgresManagerTest {
 
     @Autowired
@@ -62,24 +60,13 @@ class ArxivPostgresManagerTest {
     private PosgressLocationSaving posgressLocationSaving;
 
     @Autowired
+    private ExecutorService executorService;
+
+    @Autowired
     private WorkMapper workMapper;
-//
-//    @ClassRule
-//    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:11.1")
-//            .withDatabaseName("integration-tests-db")
-//            .withUsername("sa")
-//            .withPassword("sa");
-//
-//    static class Initializer
-//            implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-//        public void initialize(ConfigurableApplicationContext configurableApplicationContext) {
-//            TestPropertyValues.of(
-//                    "spring.datasource.url=" + postgreSQLContainer.getJdbcUrl(),
-//                    "spring.datasource.username=" + postgreSQLContainer.getUsername(),
-//                    "spring.datasource.password=" + postgreSQLContainer.getPassword()
-//            ).applyTo(configurableApplicationContext.getEnvironment());
-//        }
-//    }
+
+    @Autowired
+    private ArxivPostgresManager arxivPostgresManager;
 
     private static final String arxivAI = "https://arxiv.org/list/cs.AI/recent";
     private static final String arxivDS = "https://arxiv.org/list/cs.DS/recent";
@@ -90,10 +77,6 @@ class ArxivPostgresManagerTest {
             throws ExecutionException, InterruptedException, TimeoutException {
 
         ArgumentCaptor<ArrayList<Article>> captor = ArgumentCaptor.forClass(ArrayList.class);
-
-        ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, posgressLocationSaving,
-                Executors.newCachedThreadPool(), workStatusRepository, workMapper);
 
         var scrappingLocation1 = ScrappingLocation.builder()
                 .maxArticleScraped(2)
@@ -153,9 +136,6 @@ class ArxivPostgresManagerTest {
     @Test
     void retrieveWorkProofFromWorkId() {
 
-        ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, posgressLocationSaving,
-                Executors.newCachedThreadPool(), workStatusRepository, workMapper);
         var workId = "uuid";
         var now = Instant.now();
         var workInProgress = new WorkStatus(now, Status.IN_PROGRESS, workId);
@@ -172,9 +152,7 @@ class ArxivPostgresManagerTest {
     @DisplayName("retrieve the latest work proof from INSTANT with success given no unvisited locations")
     @Test
     void retrieveWorkProofFromInstantNoUnvisitedLocations() {
-        ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, posgressLocationSaving,
-                Executors.newCachedThreadPool(), workStatusRepository, workMapper);
+
         var firstWorkId = "uuid";
         var now = Instant.now();
         var workInProgress = new WorkStatus(now.minus(1L, ChronoUnit.SECONDS), Status.IN_PROGRESS, firstWorkId);
@@ -191,9 +169,7 @@ class ArxivPostgresManagerTest {
     @DisplayName("retrieve the latest work proof from INSTANT returns empty value given one unvisited locations")
     @Test
     void retrieveWorkProofFromInstantOneUnvisitedLocation() {
-        ArxivPostgresManager arxivPostgresManager = new ArxivPostgresManager(articleRetrieval, locationRetrieval,
-                articleRepository, posgressLocationSaving,
-                Executors.newCachedThreadPool(), workStatusRepository, workMapper);
+
         var firstWorkId = "uuid";
         var now = Instant.now();
         var workInProgress = new WorkStatus(now.minus(1L, ChronoUnit.SECONDS), Status.IN_PROGRESS, firstWorkId);

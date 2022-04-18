@@ -13,8 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,8 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @ActiveProfiles("test")
-@Transactional
-@DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ScrappingClientServiceTest {
 
     @Autowired
@@ -33,10 +32,11 @@ class ScrappingClientServiceTest {
     @Autowired
     private ScrapLocationMapper scrapLocationMapper;
 
+    @Autowired
+    private ScrappingClientService scrappingClientService;
+
     @Test
     void given_scrapLocationDto_when_addLocation_then_locationIsSavedInDB() {
-
-        var scrappingClientService = new ScrappingClientService(scrappingLocationRepository, scrapLocationMapper);
 
         Long id = scrappingClientService.addLocation(new ScrapLocationDto("testUrl", "1-d", "testNickname", 1));
 
@@ -47,8 +47,6 @@ class ScrappingClientServiceTest {
     @Test
     void given_locationIdNotInDB_when_getLocation_then_emptyListReturned() {
 
-        var scrappingClientService = new ScrappingClientService(scrappingLocationRepository, scrapLocationMapper);
-
         var result = scrappingClientService.getLocation(1L);
 
         Assertions.assertThat(result).isEmpty();
@@ -56,7 +54,7 @@ class ScrappingClientServiceTest {
     }
 
     @Test
-    void given_locationInInDB_when_getLocation_then_locationReturned() {
+    void given_locationInInDB_when_getLocation_then_locationReturned() throws InterruptedException {
         var scrappingLocation = ScrappingLocation.builder()
                 .maxArticleScraped(2)
                 .nickname("arxiv-ai")
@@ -75,7 +73,7 @@ class ScrappingClientServiceTest {
     }
 
     @Test
-    void given_locationInInDB_when_getLocationByPage_then_locationReturned() {
+    void given_locationInInDB_when_getLocationByPage_then_locationReturned() throws InterruptedException {
         var scrappingLocation = ScrappingLocation.builder()
                 .maxArticleScraped(2)
                 .nickname("arxiv-ai")
@@ -94,7 +92,7 @@ class ScrappingClientServiceTest {
     }
 
     @Test
-    void given_locationInInDB_when_updateLocation_then_locationReturned() {
+    void given_locationInInDB_when_updateLocation_then_locationReturned() throws InterruptedException {
         var scrappingLocation = ScrappingLocation.builder()
                 .maxArticleScraped(2)
                 .nickname("arxiv-ai")
@@ -124,8 +122,6 @@ class ScrappingClientServiceTest {
     @Test
     void given_locationNotInInDB_when_updateLocation_then_returnFalseAndNoUpdate() {
 
-        var scrappingClientService = new ScrappingClientService(scrappingLocationRepository, scrapLocationMapper);
-
         var updateDto = new ScrapLocationDto("testUrl", "testFreq", "testNickname", 1);
 
         var result = scrappingClientService.updateLocation(100L, updateDto);
@@ -136,10 +132,8 @@ class ScrappingClientServiceTest {
     @Test
     void given_locationNotInInDB_when_deleteLocations_then_exceptionThrown() {
 
-        var scrappingClientService = new ScrappingClientService(scrappingLocationRepository, scrapLocationMapper);
-
         ArfeException exception = assertThrows(ArfeException.class, () -> {
-            scrappingClientService.deleteLocations(List.of(1L, 2L));
+            scrappingClientService.deleteLocations(Arrays.asList(1L, 2L));
         });
 
         Assertions.assertThat(exception.getStatus()).isEqualTo(HttpStatus.CONFLICT);
@@ -156,8 +150,6 @@ class ScrappingClientServiceTest {
                 .build();
 
         scrappingLocation = scrappingLocationRepository.save(scrappingLocation);
-
-        var scrappingClientService = new ScrappingClientService(scrappingLocationRepository, scrapLocationMapper);
 
         scrappingClientService.deleteLocations(List.of(scrappingLocation.id()));
 

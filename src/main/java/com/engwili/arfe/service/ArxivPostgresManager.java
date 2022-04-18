@@ -11,6 +11,8 @@ import com.engwili.arfe.repository.ArticleRepository;
 import com.engwili.arfe.repository.WorkStatusRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Comparator;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+
 
 @RequiredArgsConstructor
 @Service
@@ -32,6 +35,7 @@ public class ArxivPostgresManager implements Manager {
     private final WorkMapper workMapper;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public CompletableFuture<Integer> scrapArticlesAndStoreThem() {
         var unvisitedScrappingLocations = locationRetrieval.retrieveUnvisitedScrappingLocations();
 
@@ -52,6 +56,7 @@ public class ArxivPostgresManager implements Manager {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public WorkProofDto storeWorkStatus(WorkStatus workStatus) {
         var saved = workStatusRepository.save(workStatus);
         return workMapper.toWorkProof(saved);

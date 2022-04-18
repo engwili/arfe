@@ -28,8 +28,6 @@ class TriggerControllerTest {
     @Autowired
     private WorkStatusRepository workStatusRepository;
 
-    //todo insert wiremocks
-
     @DisplayName("when scrap location then return proof of work with status in progress")
     @Test
     void triggerScrapping() {
@@ -100,5 +98,4 @@ class TriggerControllerTest {
         var result2 = triggerController.triggerScrapping();
         assertThat(result).isNotEqualTo(result2);
     }
-
 }
